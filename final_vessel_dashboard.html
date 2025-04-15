@@ -1,0 +1,2427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vessel Data Analysis Dashboard</title>
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --border-radius: 6px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        /* Main Content Styles */
+        main {
+            margin: 20px 0;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #1a252f;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        /* File Upload Styles */
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            border: 2px dashed #ddd;
+            border-radius: var(--border-radius);
+            background-color: #f9f9f9;
+            transition: var(--transition);
+        }
+
+        .file-upload:hover {
+            border-color: var(--secondary-color);
+        }
+
+        .file-upload-icon {
+            font-size: 48px;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .file-upload-text {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-list {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: var(--border-radius);
+            margin-bottom: 5px;
+        }
+
+        .file-item-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 10px;
+        }
+
+        .file-item-remove {
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .col-12 {
+            grid-column: span 12;
+        }
+
+        .col-6 {
+            grid-column: span 6;
+        }
+
+        .col-4 {
+            grid-column: span 4;
+        }
+
+        .col-3 {
+            grid-column: span 3;
+        }
+
+        /* Dashboard Specific Styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .dashboard-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 400px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Data Table */
+        .data-table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination-item {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 0 5px;
+            border-radius: var(--border-radius);
+            background-color: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .pagination-item.active {
+            background-color: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        /* Loading Spinner */
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--secondary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(-20px);
+            transition: var(--transition);
+        }
+
+        .modal-backdrop.show .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-weight: bold;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab:hover {
+            background-color: #f5f5f5;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--secondary-color);
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .col-6 {
+                grid-column: span 12;
+            }
+            
+            .col-4 {
+                grid-column: span 6;
+            }
+            
+            .col-3 {
+                grid-column: span 6;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .col-4 {
+                grid-column: span 12;
+            }
+            
+            .col-3 {
+                grid-column: span 12;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .dashboard-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Font Awesome Icons (using Unicode) */
+        .icon {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+    </style>
+    <!-- Load Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Load PapaParse for CSV parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <!-- Load JSZip for Excel export -->
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js"></script>
+    <!-- Load FileSaver.js for saving files -->
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <!-- Load SheetJS for Excel handling -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Vessel <span>Data Analysis</span></div>
+                <div id="lastUpdated">Last updated: Never</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div class="dashboard-title">Vessel Monitoring Dashboard</div>
+                <div class="dashboard-actions">
+                    <button id="exportBtn" class="btn btn-success">Export Data</button>
+                    <button id="refreshBtn" class="btn btn-primary">Refresh</button>
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="card">
+                <div class="card-header">
+                    <span>Upload Vessel Files</span>
+                    <button id="processFilesBtn" class="btn btn-primary" disabled>Process Files</button>
+                </div>
+                <div class="card-body">
+                    <div class="file-upload" id="fileUploadArea">
+                        <div class="file-upload-icon">📁</div>
+                        <div class="file-upload-text">
+                            <p>Drag and drop vessel files here or click to browse</p>
+                            <p><small>Supports Excel files (.xls, .xlsx) - Up to 30 files</small></p>
+                        </div>
+                        <input type="file" class="file-upload-input" id="fileInput" multiple accept=".xls,.xlsx">
+                    </div>
+                    <div class="file-list" id="fileList"></div>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <div id="alertContainer"></div>
+
+            <!-- Loading Indicator -->
+            <div class="spinner-container" id="loadingSpinner" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- Filter Panel -->
+            <div class="filter-panel" id="filterPanel" style="display: none;">
+                <div class="filter-title">Filter Data</div>
+                <div class="filter-form">
+                    <div class="form-group">
+                        <label class="form-label" for="vesselFilter">Vessel</label>
+                        <select class="form-control" id="vesselFilter">
+                            <option value="">All Vessels</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="componentFilter">Component</label>
+                        <select class="form-control" id="componentFilter">
+                            <option value="">All Components</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="mpNameFilter">MP Name</label>
+                        <select class="form-control" id="mpNameFilter">
+                            <option value="">All MP Names</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="dateRangeFilter">Date Range</label>
+                        <select class="form-control" id="dateRangeFilter">
+                            <option value="">All Dates</option>
+                            <option value="last7">Last 7 Days</option>
+                            <option value="last30">Last 30 Days</option>
+                            <option value="last90">Last 90 Days</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="customDateContainer" style="display: none;">
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label class="form-label" for="startDate">Start Date</label>
+                                <input type="date" class="form-control" id="startDate">
+                            </div>
+                            <div style="flex: 1;">
+                                <label class="form-label" for="endDate">End Date</label>
+                                <input type="date" class="form-control" id="endDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button id="applyFiltersBtn" class="btn btn-primary">Apply Filters</button>
+                    <button id="resetFiltersBtn" class="btn">Reset</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div id="dashboardContent" style="display: none;">
+                <!-- Stats Cards -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon">🚢</div>
+                        <div class="stat-value" id="vesselCount">0</div>
+                        <div class="stat-label">Vessels</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚙️</div>
+                        <div class="stat-value" id="componentCount">0</div>
+                        <div class="stat-label">Components</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-value" id="readingCount">0</div>
+                        <div class="stat-label">Total Readings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-value" id="dateRange">N/A</div>
+                        <div class="stat-label">Date Range</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid">
+                    <!-- Vibration Trends Chart -->
+                    <div class="col-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Vibration Trends Over Time</div>
+                            <canvas id="vibrationTrendsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Component Distribution Chart -->
+                    <div class="col-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Component Distribution</div>
+                            <canvas id="componentDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Vessel Comparison Chart -->
+                    <div class="col-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Vessel Comparison</div>
+                            <canvas id="vesselComparisonChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Parameter Correlation Chart -->
+                    <div class="col-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Parameter Correlation</div>
+                            <canvas id="parameterCorrelationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Table Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>Data Table</span>
+                        <div>
+                            <select id="columnSelector" class="form-control" style="display: inline-block; width: auto;">
+                                <option value="essential">Essential Columns</option>
+                                <option value="all">All Columns</option>
+                                <option value="vibration">Vibration Columns</option>
+                                <option value="bearing">Bearing Columns</option>
+                                <option value="custom">Custom Columns</option>
+                            </select>
+                            <button id="customColumnsBtn" class="btn" style="display: none;">Select Columns</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="data-table-container">
+                            <table class="data-table" id="dataTable">
+                                <thead>
+                                    <tr id="tableHeader">
+                                        <th>Loading...</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                    <tr>
+                                        <td>Loading data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Export Modal -->
+    <div class="modal-backdrop" id="exportModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Export Data</div>
+                <button class="modal-close" id="closeExportModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Export Format</label>
+                    <div style="display: flex; gap: 10px;">
+                        <label style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); cursor: pointer;">
+                            <input type="radio" name="exportFormat" value="csv" checked> CSV
+                        </label>
+                        <label style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); cursor: pointer;">
+                            <input type="radio" name="exportFormat" value="excel"> Excel
+                        </label>
+                        <label style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); cursor: pointer;">
+                            <input type="radio" name="exportFormat" value="json"> JSON
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Export Content</label>
+                    <div style="display: flex; gap: 10px;">
+                        <label style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); cursor: pointer;">
+                            <input type="radio" name="exportContent" value="filtered" checked> Filtered Data
+                        </label>
+                        <label style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); cursor: pointer;">
+                            <input type="radio" name="exportContent" value="all"> All Data
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Include Charts</label>
+                    <div style="display: flex; gap: 10px;">
+                        <label style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); cursor: pointer;">
+                            <input type="checkbox" id="includeCharts"> Include Chart Images
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="exportFilename">Filename</label>
+                    <input type="text" class="form-control" id="exportFilename" value="vessel_data_export">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancelExportBtn">Cancel</button>
+                <button class="btn btn-primary" id="confirmExportBtn">Export</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Columns Modal -->
+    <div class="modal-backdrop" id="columnsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Select Columns</div>
+                <button class="modal-close" id="closeColumnsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 10px;">
+                    <button id="selectAllColumnsBtn" class="btn btn-sm">Select All</button>
+                    <button id="deselectAllColumnsBtn" class="btn btn-sm">Deselect All</button>
+                </div>
+                <div id="columnCheckboxes" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancelColumnsBtn">Cancel</button>
+                <button class="btn btn-primary" id="applyColumnsBtn">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let allData = []; // All data from uploaded files
+        let filteredData = []; // Data after applying filters
+        let displayData = []; // Data currently displayed in the table
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let charts = {}; // Store chart instances
+        let selectedColumns = []; // Columns selected for display
+        let columnCategories = {}; // Categories of columns
+        let fileList = []; // List of uploaded files
+
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileListElement = document.getElementById('fileList');
+        const processFilesBtn = document.getElementById('processFilesBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const alertContainer = document.getElementById('alertContainer');
+        const filterPanel = document.getElementById('filterPanel');
+        const dashboardContent = document.getElementById('dashboardContent');
+        const vesselFilter = document.getElementById('vesselFilter');
+        const componentFilter = document.getElementById('componentFilter');
+        const mpNameFilter = document.getElementById('mpNameFilter');
+        const dateRangeFilter = document.getElementById('dateRangeFilter');
+        const customDateContainer = document.getElementById('customDateContainer');
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+        const vesselCount = document.getElementById('vesselCount');
+        const componentCount = document.getElementById('componentCount');
+        const readingCount = document.getElementById('readingCount');
+        const dateRangeElement = document.getElementById('dateRange');
+        const tableHeader = document.getElementById('tableHeader');
+        const tableBody = document.getElementById('tableBody');
+        const pagination = document.getElementById('pagination');
+        const columnSelector = document.getElementById('columnSelector');
+        const customColumnsBtn = document.getElementById('customColumnsBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const exportModal = document.getElementById('exportModal');
+        const closeExportModal = document.getElementById('closeExportModal');
+        const cancelExportBtn = document.getElementById('cancelExportBtn');
+        const confirmExportBtn = document.getElementById('confirmExportBtn');
+        const exportFilename = document.getElementById('exportFilename');
+        const includeCharts = document.getElementById('includeCharts');
+        const columnsModal = document.getElementById('columnsModal');
+        const closeColumnsModal = document.getElementById('closeColumnsModal');
+        const columnCheckboxes = document.getElementById('columnCheckboxes');
+        const selectAllColumnsBtn = document.getElementById('selectAllColumnsBtn');
+        const deselectAllColumnsBtn = document.getElementById('deselectAllColumnsBtn');
+        const applyColumnsBtn = document.getElementById('applyColumnsBtn');
+        const cancelColumnsBtn = document.getElementById('cancelColumnsBtn');
+        const lastUpdated = document.getElementById('lastUpdated');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initEventListeners();
+            updateLastUpdated();
+        });
+
+        // Initialize event listeners
+        function initEventListeners() {
+            // File upload events
+            fileInput.addEventListener('change', handleFileSelection);
+            fileUploadArea.addEventListener('dragover', handleDragOver);
+            fileUploadArea.addEventListener('dragleave', handleDragLeave);
+            fileUploadArea.addEventListener('drop', handleFileDrop);
+            processFilesBtn.addEventListener('click', processFiles);
+
+            // Filter events
+            dateRangeFilter.addEventListener('change', toggleCustomDateRange);
+            applyFiltersBtn.addEventListener('click', applyFilters);
+            resetFiltersBtn.addEventListener('click', resetFilters);
+
+            // Table events
+            columnSelector.addEventListener('change', handleColumnSelectorChange);
+            customColumnsBtn.addEventListener('click', openColumnsModal);
+
+            // Export events
+            exportBtn.addEventListener('click', openExportModal);
+            closeExportModal.addEventListener('click', closeExportModal);
+            cancelExportBtn.addEventListener('click', closeExportModal);
+            confirmExportBtn.addEventListener('click', exportData);
+
+            // Custom columns modal events
+            closeColumnsModal.addEventListener('click', closeColumnsModal);
+            cancelColumnsBtn.addEventListener('click', closeColumnsModal);
+            selectAllColumnsBtn.addEventListener('click', selectAllColumns);
+            deselectAllColumnsBtn.addEventListener('click', deselectAllColumns);
+            applyColumnsBtn.addEventListener('click', applyCustomColumns);
+
+            // Refresh button
+            refreshBtn.addEventListener('click', refreshDashboard);
+        }
+
+        // File Upload Handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('active');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('active');
+        }
+
+        function handleFileDrop(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('active');
+            
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        }
+
+        function handleFileSelection(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            // Check if adding these files would exceed the limit
+            if (fileList.length + files.length > 30) {
+                showAlert('warning', 'Maximum 30 files allowed. Please remove some files first.');
+                return;
+            }
+            
+            // Add files to the list
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Check if file is Excel
+                if (!file.name.match(/\.(xls|xlsx)$/i)) {
+                    showAlert('warning', `${file.name} is not an Excel file. Only .xls and .xlsx files are supported.`);
+                    continue;
+                }
+                
+                // Check if file is already in the list
+                const isDuplicate = fileList.some(f => f.name === file.name);
+                if (isDuplicate) {
+                    showAlert('warning', `${file.name} is already in the list.`);
+                    continue;
+                }
+                
+                // Add file to the list
+                fileList.push(file);
+                
+                // Create file item in the UI
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-item-name">${file.name}</div>
+                    <div class="file-item-remove" data-filename="${file.name}">×</div>
+                `;
+                fileListElement.appendChild(fileItem);
+                
+                // Add event listener to remove button
+                const removeBtn = fileItem.querySelector('.file-item-remove');
+                removeBtn.addEventListener('click', function() {
+                    const filename = this.getAttribute('data-filename');
+                    removeFile(filename);
+                });
+            }
+            
+            // Enable process button if files are added
+            if (fileList.length > 0) {
+                processFilesBtn.disabled = false;
+            }
+        }
+
+        function removeFile(filename) {
+            // Remove file from the list
+            fileList = fileList.filter(file => file.name !== filename);
+            
+            // Remove file item from the UI
+            const fileItems = fileListElement.querySelectorAll('.file-item');
+            fileItems.forEach(item => {
+                const itemFilename = item.querySelector('.file-item-remove').getAttribute('data-filename');
+                if (itemFilename === filename) {
+                    fileListElement.removeChild(item);
+                }
+            });
+            
+            // Disable process button if no files are left
+            if (fileList.length === 0) {
+                processFilesBtn.disabled = true;
+            }
+        }
+
+        // Process uploaded files
+        function processFiles() {
+            if (fileList.length === 0) {
+                showAlert('warning', 'Please upload at least one file.');
+                return;
+            }
+            
+            // Show loading spinner
+            loadingSpinner.style.display = 'flex';
+            
+            // Process each file
+            const promises = fileList.map(file => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        try {
+                            // Extract vessel name from filename
+                            const vesselName = file.name.split(' CBM')[0];
+                            
+                            // Parse Excel file
+                            const data = parseExcelFile(e.target.result, vesselName);
+                            resolve(data);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+                    
+                    reader.onerror = function() {
+                        reject(new Error(`Failed to read file: ${file.name}`));
+                    };
+                    
+                    reader.readAsArrayBuffer(file);
+                });
+            });
+            
+            // Process all files
+            Promise.all(promises)
+                .then(results => {
+                    // Combine all data
+                    allData = [].concat(...results);
+                    
+                    // Process the combined data
+                    processData();
+                    
+                    // Show success message
+                    showAlert('success', `Successfully processed ${fileList.length} files with ${allData.length} records.`);
+                    
+                    // Update last updated time
+                    updateLastUpdated();
+                })
+                .catch(error => {
+                    showAlert('danger', `Error processing files: ${error.message}`);
+                })
+                .finally(() => {
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                });
+        }
+
+        // Parse Excel file
+        function parseExcelFile(arrayBuffer, vesselName) {
+            try {
+                // Use SheetJS to parse Excel file
+                const workbook = XLSX.read(new Uint8Array(arrayBuffer), {type: 'array'});
+                
+                // Get first sheet
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                
+                // Convert to JSON
+                let data = XLSX.utils.sheet_to_json(worksheet);
+                
+                // Add vessel name to each record
+                data = data.map(item => ({
+                    ...item,
+                    VESSEL_NAME: vesselName
+                }));
+                
+                // Process data
+                data = processData(data);
+                
+                return data;
+            } catch (error) {
+                console.error("Error parsing Excel file:", error);
+                throw error;
+            }
+        }
+
+        // Clean data by removing NaN columns
+        function cleanData(data) {
+            if (!data || data.length === 0) return [];
+            
+            // Get all columns
+            const columns = Object.keys(data[0]);
+            
+            // Find columns with all NaN values
+            const nanColumns = columns.filter(col => {
+                return data.every(row => {
+                    const value = row[col];
+                    return value === null || value === undefined || 
+                           (typeof value === 'number' && isNaN(value)) ||
+                           value === '';
+                });
+            });
+            
+            // Remove NaN columns from data
+            return data.map(row => {
+                const newRow = {...row};
+                nanColumns.forEach(col => {
+                    delete newRow[col];
+                });
+                return newRow;
+            });
+        }
+
+        // Create timestamp from DATE and TIME columns
+        function createTimestamp(data) {
+            return data.map(row => {
+                const newRow = {...row};
+                
+                if (row.DATE && row.TIME) {
+                    // Handle different date formats
+                    let dateObj;
+                    if (row.DATE instanceof Date) {
+                        dateObj = row.DATE;
+                    } else if (typeof row.DATE === 'string') {
+                        dateObj = new Date(row.DATE);
+                    } else if (typeof row.DATE === 'number') {
+                        // Excel date number
+                        dateObj = new Date(Math.round((row.DATE - 25569) * 86400 * 1000));
+                    }
+                    
+                    if (dateObj && !isNaN(dateObj.getTime())) {
+                        // Format time
+                        let timeStr = row.TIME;
+                        if (typeof timeStr === 'number') {
+                            // Convert Excel time number to string
+                            const hours = Math.floor(timeStr * 24);
+                            const minutes = Math.floor((timeStr * 24 * 60) % 60);
+                            const seconds = Math.floor((timeStr * 24 * 60 * 60) % 60);
+                            timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                        }
+                        
+                        // Create timestamp
+                        const dateStr = dateObj.toISOString().split('T')[0];
+                        newRow.TIMESTAMP = new Date(`${dateStr}T${timeStr}`);
+                    }
+                }
+                
+                return newRow;
+            });
+        }
+
+        // Process data
+        function processData(data) {
+            // Clean data
+            data = cleanData(data);
+            
+            // Create timestamp
+            data = createTimestamp(data);
+            
+            // Sort by timestamp
+            if (data.length > 0 && data[0].TIMESTAMP) {
+                data.sort((a, b) => {
+                    if (!a.TIMESTAMP) return 1;
+                    if (!b.TIMESTAMP) return -1;
+                    return a.TIMESTAMP - b.TIMESTAMP;
+                });
+            }
+            
+            return data;
+        }
+
+        // Process the data
+        function processData() {
+            // Set filtered data to all data initially
+            filteredData = [...allData];
+            
+            // Populate filters
+            populateFilters();
+            
+            // Show filter panel and dashboard content
+            filterPanel.style.display = 'block';
+            dashboardContent.style.display = 'block';
+            
+            // Update dashboard
+            updateDashboard();
+        }
+
+        // Populate filter dropdowns
+        function populateFilters() {
+            // Clear existing options
+            vesselFilter.innerHTML = '<option value="">All Vessels</option>';
+            componentFilter.innerHTML = '<option value="">All Components</option>';
+            mpNameFilter.innerHTML = '<option value="">All MP Names</option>';
+            
+            // Get unique values
+            const vessels = [...new Set(allData.map(item => item.VESSEL_NAME))];
+            const components = [...new Set(allData.map(item => item.COMP_NAME))];
+            const mpNames = [...new Set(allData.map(item => item.MP_NAME))];
+            
+            // Add options to dropdowns
+            vessels.forEach(vessel => {
+                const option = document.createElement('option');
+                option.value = vessel;
+                option.textContent = vessel;
+                vesselFilter.appendChild(option);
+            });
+            
+            components.forEach(component => {
+                const option = document.createElement('option');
+                option.value = component;
+                option.textContent = component;
+                componentFilter.appendChild(option);
+            });
+            
+            mpNames.forEach(mpName => {
+                const option = document.createElement('option');
+                option.value = mpName;
+                option.textContent = mpName;
+                mpNameFilter.appendChild(option);
+            });
+        }
+
+        // Toggle custom date range inputs
+        function toggleCustomDateRange() {
+            if (dateRangeFilter.value === 'custom') {
+                customDateContainer.style.display = 'block';
+            } else {
+                customDateContainer.style.display = 'none';
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            // Get filter values
+            const vessel = vesselFilter.value;
+            const component = componentFilter.value;
+            const mpName = mpNameFilter.value;
+            const dateRange = dateRangeFilter.value;
+            
+            // Filter data
+            filteredData = allData.filter(item => {
+                // Apply vessel filter
+                if (vessel && item.VESSEL_NAME !== vessel) {
+                    return false;
+                }
+                
+                // Apply component filter
+                if (component && item.COMP_NAME !== component) {
+                    return false;
+                }
+                
+                // Apply MP name filter
+                if (mpName && item.MP_NAME !== mpName) {
+                    return false;
+                }
+                
+                // Apply date filter
+                if (dateRange) {
+                    const itemDate = new Date(item.TIMESTAMP);
+                    const today = new Date();
+                    
+                    if (dateRange === 'last7') {
+                        const lastWeek = new Date();
+                        lastWeek.setDate(today.getDate() - 7);
+                        if (itemDate < lastWeek) {
+                            return false;
+                        }
+                    } else if (dateRange === 'last30') {
+                        const lastMonth = new Date();
+                        lastMonth.setDate(today.getDate() - 30);
+                        if (itemDate < lastMonth) {
+                            return false;
+                        }
+                    } else if (dateRange === 'last90') {
+                        const lastQuarter = new Date();
+                        lastQuarter.setDate(today.getDate() - 90);
+                        if (itemDate < lastQuarter) {
+                            return false;
+                        }
+                    } else if (dateRange === 'custom') {
+                        const start = startDate.value ? new Date(startDate.value) : null;
+                        const end = endDate.value ? new Date(endDate.value) : null;
+                        
+                        if (start && itemDate < start) {
+                            return false;
+                        }
+                        
+                        if (end) {
+                            // Set end date to end of day
+                            end.setHours(23, 59, 59, 999);
+                            if (itemDate > end) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                
+                return true;
+            });
+            
+            // Update dashboard with filtered data
+            updateDashboard();
+            
+            // Show message
+            showAlert('info', `Applied filters: ${filteredData.length} records match the criteria.`);
+        }
+
+        // Reset filters
+        function resetFilters() {
+            vesselFilter.value = '';
+            componentFilter.value = '';
+            mpNameFilter.value = '';
+            dateRangeFilter.value = '';
+            customDateContainer.style.display = 'none';
+            startDate.value = '';
+            endDate.value = '';
+            
+            // Reset filtered data to all data
+            filteredData = [...allData];
+            
+            // Update dashboard
+            updateDashboard();
+            
+            // Show message
+            showAlert('info', 'Filters reset. Showing all data.');
+        }
+
+        // Update dashboard with current data
+        function updateDashboard() {
+            // Update stats
+            updateStats();
+            
+            // Update charts
+            updateCharts();
+            
+            // Update table
+            updateTable();
+        }
+
+        // Update statistics
+        function updateStats() {
+            // Count unique vessels
+            const vessels = [...new Set(filteredData.map(item => item.VESSEL_NAME))];
+            vesselCount.textContent = vessels.length;
+            
+            // Count unique components
+            const components = [...new Set(filteredData.map(item => item.COMP_NAME))];
+            componentCount.textContent = components.length;
+            
+            // Count total readings
+            readingCount.textContent = filteredData.length;
+            
+            // Calculate date range
+            if (filteredData.length > 0) {
+                const dates = filteredData.map(item => new Date(item.TIMESTAMP));
+                const minDate = new Date(Math.min(...dates));
+                const maxDate = new Date(Math.max(...dates));
+                
+                dateRangeElement.textContent = `${minDate.toLocaleDateString()} - ${maxDate.toLocaleDateString()}`;
+            } else {
+                dateRangeElement.textContent = 'N/A';
+            }
+        }
+
+        // Update charts
+        function updateCharts() {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+            
+            // Create new charts
+            createVibrationTrendsChart();
+            createComponentDistributionChart();
+            createVesselComparisonChart();
+            createParameterCorrelationChart();
+        }
+
+        // Create vibration trends chart
+        function createVibrationTrendsChart() {
+            const ctx = document.getElementById('vibrationTrendsChart').getContext('2d');
+            
+            // Check if data exists
+            if (!filteredData || filteredData.length === 0) {
+                // Create empty chart with message
+                charts.vibrationTrends = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: []
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'No data available for vibration trends'
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+            
+            // Group data by date and vessel
+            const groupedData = {};
+            
+            // Find the vibration column to use
+            const vibrationColumns = [
+                'Vel, Rms (RMS)', 
+                'Vib_H', 
+                'Vib_V', 
+                'Vib_A'
+            ];
+            
+            let selectedVibColumn = null;
+            for (const col of vibrationColumns) {
+                if (filteredData.some(item => item[col] !== undefined && item[col] !== null)) {
+                    selectedVibColumn = col;
+                    break;
+                }
+            }
+            
+            if (!selectedVibColumn) {
+                // No vibration data found
+                charts.vibrationTrends = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: []
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'No vibration data available in the dataset'
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+            
+            // Group data
+            filteredData.forEach(item => {
+                if (!item.TIMESTAMP || !item[selectedVibColumn]) return;
+                
+                const date = new Date(item.TIMESTAMP).toLocaleDateString();
+                const vessel = item.VESSEL_NAME || 'Unknown';
+                
+                if (!groupedData[vessel]) {
+                    groupedData[vessel] = {};
+                }
+                
+                if (!groupedData[vessel][date]) {
+                    groupedData[vessel][date] = [];
+                }
+                
+                groupedData[vessel][date].push(parseFloat(item[selectedVibColumn]) || 0);
+            });
+            
+            // Calculate average for each date and vessel
+            const datasets = [];
+            const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'];
+            
+            let colorIndex = 0;
+            const allDates = new Set();
+            
+            for (const vessel in groupedData) {
+                const data = [];
+                const dates = [];
+                
+                for (const date in groupedData[vessel]) {
+                    const values = groupedData[vessel][date];
+                    const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+                    
+                    data.push({
+                        date: date,
+                        value: average
+                    });
+                    
+                    allDates.add(date);
+                }
+                
+                // Sort by date
+                data.sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+                datasets.push({
+                    label: vessel,
+                    data: data.map(item => item.value),
+                    borderColor: colors[colorIndex % colors.length],
+                    backgroundColor: colors[colorIndex % colors.length] + '20',
+                    tension: 0.4,
+                    fill: true
+                });
+                
+                colorIndex++;
+            }
+            
+            // Get sorted array of all dates
+            const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+            
+            // Create chart
+            charts.vibrationTrends = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sortedDates,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Average ${selectedVibColumn} Over Time`
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: selectedVibColumn
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create component distribution chart
+        function createComponentDistributionChart() {
+            const ctx = document.getElementById('componentDistributionChart').getContext('2d');
+            
+            // Count components
+            const componentCounts = {};
+            filteredData.forEach(item => {
+                const component = item.COMP_NAME;
+                componentCounts[component] = (componentCounts[component] || 0) + 1;
+            });
+            
+            // Sort components by count
+            const sortedComponents = Object.entries(componentCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10); // Top 10 components
+            
+            // Create chart
+            charts.componentDistribution = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedComponents.map(item => item[0]),
+                    datasets: [{
+                        label: 'Number of Readings',
+                        data: sortedComponents.map(item => item[1]),
+                        backgroundColor: [
+                            '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6',
+                            '#1abc9c', '#d35400', '#34495e', '#7f8c8d', '#27ae60'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Component Distribution'
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Component'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Number of Readings'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create vessel comparison chart
+        function createVesselComparisonChart() {
+            const ctx = document.getElementById('vesselComparisonChart').getContext('2d');
+            
+            // Calculate average values for each vessel
+            const vesselData = {};
+            filteredData.forEach(item => {
+                const vessel = item.VESSEL_NAME;
+                
+                if (!vesselData[vessel]) {
+                    vesselData[vessel] = {
+                        count: 0,
+                        'Vel, Rms (RMS)': 0,
+                        'Acc, Rms (RMS)': 0,
+                        'Disp, Rms (RMS)': 0
+                    };
+                }
+                
+                vesselData[vessel].count++;
+                vesselData[vessel]['Vel, Rms (RMS)'] += parseFloat(item['Vel, Rms (RMS)'] || 0);
+                vesselData[vessel]['Acc, Rms (RMS)'] += parseFloat(item['Acc, Rms (RMS)'] || 0);
+                vesselData[vessel]['Disp, Rms (RMS)'] += parseFloat(item['Disp, Rms (RMS)'] || 0);
+            });
+            
+            // Calculate averages
+            for (const vessel in vesselData) {
+                vesselData[vessel]['Vel, Rms (RMS)'] /= vesselData[vessel].count || 1;
+                vesselData[vessel]['Acc, Rms (RMS)'] /= vesselData[vessel].count || 1;
+                vesselData[vessel]['Disp, Rms (RMS)'] /= vesselData[vessel].count || 1;
+            }
+            
+            // Create chart
+            charts.vesselComparison = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Velocity', 'Acceleration', 'Displacement'],
+                    datasets: Object.entries(vesselData).map(([vessel, data], index) => ({
+                        label: vessel,
+                        data: [
+                            data['Vel, Rms (RMS)'],
+                            data['Acc, Rms (RMS)'],
+                            data['Disp, Rms (RMS)']
+                        ],
+                        borderColor: [
+                            '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'
+                        ][index % 5],
+                        backgroundColor: [
+                            '#3498db20', '#e74c3c20', '#2ecc7120', '#f39c1220', '#9b59b620'
+                        ][index % 5]
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Vessel Parameter Comparison'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create parameter correlation chart
+        function createParameterCorrelationChart() {
+            const ctx = document.getElementById('parameterCorrelationChart').getContext('2d');
+            
+            // Get numeric parameters
+            const parameters = [
+                'Vel, Rms (RMS)',
+                'Acc, Rms (RMS)',
+                'Disp, Rms (RMS)',
+                'Bearing (RMS)',
+                'Shaft, 10 Unbalance (RMS)',
+                'Shaft, 11 Misalignment (RMS)'
+            ].filter(param => 
+                filteredData.some(item => item[param] !== undefined && item[param] !== null)
+            );
+            
+            if (parameters.length === 0) {
+                // No parameters found
+                charts.parameterCorrelation = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: []
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'No parameters available for correlation analysis'
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+            
+            // Calculate correlation matrix
+            const correlationMatrix = [];
+            
+            for (let i = 0; i < parameters.length; i++) {
+                correlationMatrix[i] = [];
+                
+                for (let j = 0; j < parameters.length; j++) {
+                    if (i === j) {
+                        correlationMatrix[i][j] = 1; // Perfect correlation with self
+                    } else {
+                        // Calculate correlation coefficient
+                        const param1 = parameters[i];
+                        const param2 = parameters[j];
+                        
+                        // Extract values
+                        const values1 = filteredData.map(item => parseFloat(item[param1] || 0));
+                        const values2 = filteredData.map(item => parseFloat(item[param2] || 0));
+                        
+                        // Calculate correlation
+                        correlationMatrix[i][j] = calculateCorrelation(values1, values2);
+                    }
+                }
+            }
+            
+            // Prepare data for heatmap
+            const data = [];
+            for (let i = 0; i < parameters.length; i++) {
+                for (let j = 0; j < parameters.length; j++) {
+                    data.push({
+                        x: parameters[j].replace(' (RMS)', ''),
+                        y: parameters[i].replace(' (RMS)', ''),
+                        v: correlationMatrix[i][j]
+                    });
+                }
+            }
+            
+            // Create chart
+            charts.parameterCorrelation = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Correlation',
+                        data: data,
+                        backgroundColor: context => {
+                            const value = context.raw.v;
+                            if (value >= 0.7) return 'rgba(46, 204, 113, 0.8)';
+                            if (value >= 0.4) return 'rgba(52, 152, 219, 0.8)';
+                            if (value >= 0) return 'rgba(241, 196, 15, 0.8)';
+                            if (value >= -0.4) return 'rgba(230, 126, 34, 0.8)';
+                            return 'rgba(231, 76, 60, 0.8)';
+                        },
+                        pointRadius: 10,
+                        pointHoverRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Parameter Correlation Matrix'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw.v;
+                                    return `Correlation: ${value.toFixed(2)}`;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: {
+                                display: true,
+                                text: 'Parameter'
+                            }
+                        },
+                        y: {
+                            type: 'category',
+                            title: {
+                                display: true,
+                                text: 'Parameter'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Calculate correlation coefficient
+        function calculateCorrelation(x, y) {
+            // Check if arrays are empty
+            if (x.length === 0 || y.length === 0) {
+                return 0;
+            }
+            
+            // Calculate means
+            const xMean = x.reduce((sum, value) => sum + value, 0) / x.length;
+            const yMean = y.reduce((sum, value) => sum + value, 0) / y.length;
+            
+            // Calculate covariance and variances
+            let covariance = 0;
+            let xVariance = 0;
+            let yVariance = 0;
+            
+            for (let i = 0; i < x.length; i++) {
+                const xDiff = x[i] - xMean;
+                const yDiff = y[i] - yMean;
+                
+                covariance += xDiff * yDiff;
+                xVariance += xDiff * xDiff;
+                yVariance += yDiff * yDiff;
+            }
+            
+            // Calculate correlation coefficient
+            if (xVariance === 0 || yVariance === 0) {
+                return 0;
+            }
+            
+            return covariance / Math.sqrt(xVariance * yVariance);
+        }
+
+        // Update table
+        function updateTable() {
+            // Get all columns
+            const allColumns = getAllColumns();
+            
+            // Set default selected columns if not set
+            if (selectedColumns.length === 0) {
+                selectedColumns = getEssentialColumns();
+            }
+            
+            // Update column categories
+            columnCategories = categorizeColumns(allColumns);
+            
+            // Update table header
+            updateTableHeader();
+            
+            // Update table body
+            updateTableBody();
+            
+            // Update pagination
+            updatePagination();
+        }
+
+        // Get all columns from data
+        function getAllColumns() {
+            if (filteredData.length === 0) {
+                return [];
+            }
+            
+            // Get all unique columns
+            const columns = new Set();
+            
+            filteredData.forEach(item => {
+                Object.keys(item).forEach(key => {
+                    columns.add(key);
+                });
+            });
+            
+            return Array.from(columns);
+        }
+
+        // Get essential columns
+        function getEssentialColumns() {
+            return [
+                'VESSEL_NAME',
+                'MP_NUMBER',
+                'MP_NAME',
+                'COMP_NAME',
+                'DATE',
+                'TIME',
+                'Vel, Rms (RMS)',
+                'Acc, Rms (RMS)',
+                'Disp, Rms (RMS)'
+            ].filter(col => getAllColumns().includes(col));
+        }
+
+        // Categorize columns
+        function categorizeColumns(columns) {
+            const categories = {
+                metadata: [
+                    'VESSEL_NAME',
+                    'MP_NUMBER',
+                    'MP_NAME',
+                    'COMP_NUMBER',
+                    'COMP_NAME',
+                    'DATE',
+                    'TIME',
+                    'TIMESTAMP'
+                ],
+                vibration: columns.filter(col => 
+                    col.includes('Vib') || 
+                    col.includes('Vel') || 
+                    col.includes('Acc') || 
+                    col.includes('Disp')
+                ),
+                bearing: columns.filter(col => 
+                    col.includes('Bearing') || 
+                    col.includes('Cuscinetto')
+                ),
+                shaft: columns.filter(col => 
+                    col.includes('Shaft')
+                ),
+                other: []
+            };
+            
+            // Add remaining columns to 'other' category
+            const categorizedColumns = [
+                ...categories.metadata,
+                ...categories.vibration,
+                ...categories.bearing,
+                ...categories.shaft
+            ];
+            
+            categories.other = columns.filter(col => !categorizedColumns.includes(col));
+            
+            return categories;
+        }
+
+        // Update table header
+        function updateTableHeader() {
+            // Clear header
+            tableHeader.innerHTML = '';
+            
+            // Add header cells
+            selectedColumns.forEach(column => {
+                const th = document.createElement('th');
+                th.textContent = column;
+                tableHeader.appendChild(th);
+            });
+        }
+
+        // Update table body
+        function updateTableBody() {
+            // Clear body
+            tableBody.innerHTML = '';
+            
+            // Calculate pagination
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            
+            // Get data for current page
+            displayData = filteredData.slice(startIndex, endIndex);
+            
+            // Add rows
+            displayData.forEach(item => {
+                const tr = document.createElement('tr');
+                
+                selectedColumns.forEach(column => {
+                    const td = document.createElement('td');
+                    
+                    // Format value based on column type
+                    if (column === 'DATE' && item[column]) {
+                        td.textContent = new Date(item[column]).toLocaleDateString();
+                    } else if (column === 'TIMESTAMP' && item[column]) {
+                        td.textContent = new Date(item[column]).toLocaleString();
+                    } else if (typeof item[column] === 'number') {
+                        td.textContent = item[column].toFixed(2);
+                    } else {
+                        td.textContent = item[column] || '';
+                    }
+                    
+                    tr.appendChild(td);
+                });
+                
+                tableBody.appendChild(tr);
+            });
+            
+            // Show message if no data
+            if (displayData.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = selectedColumns.length;
+                td.textContent = 'No data available';
+                td.style.textAlign = 'center';
+                tr.appendChild(td);
+                tableBody.appendChild(tr);
+            }
+        }
+
+        // Update pagination
+        function updatePagination() {
+            // Clear pagination
+            pagination.innerHTML = '';
+            
+            // Calculate total pages
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            // Add pagination items
+            for (let i = 1; i <= totalPages; i++) {
+                const pageItem = document.createElement('div');
+                pageItem.className = `pagination-item${i === currentPage ? ' active' : ''}`;
+                pageItem.textContent = i;
+                
+                pageItem.addEventListener('click', function() {
+                    currentPage = i;
+                    updateTableBody();
+                    updatePagination();
+                });
+                
+                pagination.appendChild(pageItem);
+            }
+            
+            // Show message if no pages
+            if (totalPages === 0) {
+                const pageItem = document.createElement('div');
+                pageItem.className = 'pagination-item active';
+                pageItem.textContent = '1';
+                pagination.appendChild(pageItem);
+            }
+        }
+
+        // Handle column selector change
+        function handleColumnSelectorChange() {
+            const value = columnSelector.value;
+            
+            if (value === 'essential') {
+                selectedColumns = getEssentialColumns();
+                customColumnsBtn.style.display = 'none';
+            } else if (value === 'all') {
+                selectedColumns = getAllColumns();
+                customColumnsBtn.style.display = 'none';
+            } else if (value === 'vibration') {
+                selectedColumns = [
+                    ...columnCategories.metadata.slice(0, 6), // First 6 metadata columns
+                    ...columnCategories.vibration
+                ];
+                customColumnsBtn.style.display = 'none';
+            } else if (value === 'bearing') {
+                selectedColumns = [
+                    ...columnCategories.metadata.slice(0, 6), // First 6 metadata columns
+                    ...columnCategories.bearing
+                ];
+                customColumnsBtn.style.display = 'none';
+            } else if (value === 'custom') {
+                customColumnsBtn.style.display = 'inline-block';
+                return; // Don't update table yet
+            }
+            
+            // Update table
+            updateTable();
+        }
+
+        // Open columns modal
+        function openColumnsModal() {
+            // Populate column checkboxes
+            populateColumnCheckboxes();
+            
+            // Show modal
+            columnsModal.classList.add('show');
+        }
+
+        // Close columns modal
+        function closeColumnsModal() {
+            columnsModal.classList.remove('show');
+        }
+
+        // Populate column checkboxes
+        function populateColumnCheckboxes() {
+            // Clear existing checkboxes
+            columnCheckboxes.innerHTML = '';
+            
+            // Get all columns
+            const allColumns = getAllColumns();
+            
+            // Create checkboxes for each category
+            for (const category in columnCategories) {
+                // Create category header
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'column-category-header';
+                categoryHeader.style.fontWeight = 'bold';
+                categoryHeader.style.marginTop = '10px';
+                categoryHeader.style.marginBottom = '5px';
+                categoryHeader.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                columnCheckboxes.appendChild(categoryHeader);
+                
+                // Create checkboxes for columns in this category
+                columnCategories[category].forEach(column => {
+                    const label = document.createElement('label');
+                    label.style.display = 'block';
+                    label.style.marginBottom = '5px';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = column;
+                    checkbox.checked = selectedColumns.includes(column);
+                    checkbox.style.marginRight = '5px';
+                    
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(column));
+                    
+                    columnCheckboxes.appendChild(label);
+                });
+            }
+        }
+
+        // Select all columns
+        function selectAllColumns() {
+            const checkboxes = columnCheckboxes.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        // Deselect all columns
+        function deselectAllColumns() {
+            const checkboxes = columnCheckboxes.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        // Apply custom columns
+        function applyCustomColumns() {
+            // Get selected columns
+            const checkboxes = columnCheckboxes.querySelectorAll('input[type="checkbox"]:checked');
+            selectedColumns = Array.from(checkboxes).map(checkbox => checkbox.value);
+            
+            // Update table
+            updateTable();
+            
+            // Close modal
+            closeColumnsModal();
+        }
+
+        // Open export modal
+        function openExportModal() {
+            exportModal.classList.add('show');
+        }
+
+        // Close export modal
+        function closeExportModal() {
+            exportModal.classList.remove('show');
+        }
+
+        // Export data
+        function exportData() {
+            // Get export options
+            const format = document.querySelector('input[name="exportFormat"]:checked').value;
+            const content = document.querySelector('input[name="exportContent"]:checked').value;
+            const includeChartsOption = includeCharts.checked;
+            const filename = exportFilename.value || 'vessel_data_export';
+            
+            // Get data to export
+            const dataToExport = content === 'filtered' ? filteredData : allData;
+            
+            // Export based on format
+            if (format === 'csv') {
+                exportCSV(dataToExport, filename);
+            } else if (format === 'excel') {
+                exportExcel(dataToExport, filename);
+            } else if (format === 'json') {
+                exportJSON(dataToExport, filename);
+            }
+            
+            // Include charts if selected
+            if (includeChartsOption) {
+                exportCharts(filename);
+            }
+            
+            // Close modal
+            closeExportModal();
+            
+            // Show success message
+            showAlert('success', `Data exported successfully as ${format.toUpperCase()}.`);
+        }
+
+        // Export as CSV
+        function exportCSV(data, filename) {
+            // Ensure data is properly formatted
+            const formattedData = data.map(item => {
+                const newItem = {...item};
+                
+                // Format dates
+                if (newItem.DATE instanceof Date) {
+                    newItem.DATE = newItem.DATE.toISOString().split('T')[0];
+                }
+                
+                if (newItem.TIMESTAMP instanceof Date) {
+                    newItem.TIMESTAMP = newItem.TIMESTAMP.toISOString();
+                }
+                
+                return newItem;
+            });
+            
+            // Convert data to CSV
+            const csv = Papa.unparse(formattedData);
+            
+            // Create blob
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            
+            // Download file
+            saveAs(blob, `${filename}.csv`);
+        }
+
+        // Export as Excel
+        function exportExcel(data, filename) {
+            // Ensure data is properly formatted
+            const formattedData = data.map(item => {
+                const newItem = {...item};
+                
+                // Format dates
+                if (newItem.DATE instanceof Date) {
+                    newItem.DATE = newItem.DATE.toISOString().split('T')[0];
+                }
+                
+                if (newItem.TIMESTAMP instanceof Date) {
+                    newItem.TIMESTAMP = newItem.TIMESTAMP.toISOString();
+                }
+                
+                return newItem;
+            });
+            
+            // Create workbook
+            const worksheet = XLSX.utils.json_to_sheet(formattedData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Vessel Data");
+            
+            // Generate Excel file
+            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            
+            // Create blob
+            const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            
+            // Download file
+            saveAs(blob, `${filename}.xlsx`);
+        }
+
+        // Export as JSON
+        function exportJSON(data, filename) {
+            // Ensure data is properly formatted
+            const formattedData = data.map(item => {
+                const newItem = {...item};
+                
+                // Format dates
+                if (newItem.DATE instanceof Date) {
+                    newItem.DATE = newItem.DATE.toISOString().split('T')[0];
+                }
+                
+                if (newItem.TIMESTAMP instanceof Date) {
+                    newItem.TIMESTAMP = newItem.TIMESTAMP.toISOString();
+                }
+                
+                return newItem;
+            });
+            
+            // Convert data to JSON
+            const json = JSON.stringify(formattedData, null, 2);
+            
+            // Create blob
+            const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+            
+            // Download file
+            saveAs(blob, `${filename}.json`);
+        }
+
+        // Export charts
+        function exportCharts(filename) {
+            // This is a simplified version
+            // In a real implementation, we would convert charts to images
+            
+            // For now, we'll just show a message
+            showAlert('info', 'Chart export functionality would be implemented in a production version.');
+        }
+
+        // Refresh dashboard
+        function refreshDashboard() {
+            // Update dashboard with current data
+            updateDashboard();
+            
+            // Update last updated time
+            updateLastUpdated();
+            
+            // Show message
+            showAlert('success', 'Dashboard refreshed successfully.');
+        }
+
+        // Update last updated time
+        function updateLastUpdated() {
+            const now = new Date();
+            lastUpdated.textContent = `Last updated: ${now.toLocaleString()}`;
+        }
+
+        // Show alert message
+        function showAlert(type, message) {
+            // Create alert element
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <div class="alert-icon">
+                    ${type === 'success' ? '✓' : type === 'danger' ? '✗' : type === 'warning' ? '⚠' : 'ℹ'}
+                </div>
+                <div>${message}</div>
+            `;
+            
+            // Add alert to container
+            alertContainer.appendChild(alert);
+            
+            // Remove alert after 5 seconds
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    alertContainer.removeChild(alert);
+                }, 300);
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
